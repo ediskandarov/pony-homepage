@@ -14,5 +14,5 @@ setup(
     long_description = 'AWESOME application for every pony',
     license = 'BSD',
     keywords = 'django pony rpm spec virtualenv rpm',
-    url = 'http://pypi.example.com/pypi/pony-homepage/',
+    url = 'https://github.com/toidi/pony-homepage',
 )
