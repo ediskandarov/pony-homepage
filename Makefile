@@ -7,18 +7,29 @@ URL := $(shell python setup.py --url)
 RELEASE := 1
 
 clean:
-	rm -rf build dist pony_homepage.egg-info
-	find . -name "*.py[co]" -delete
-	find . -name "*~" -delete
-	rm -f $(NAME)-*.tar.gz
+	git clean -dfx
 
-archive: clean
-	tar -czf $(NAME)-$(VERSION).tar.gz .
+build_prepare:
+	mkdir -p SOURCES
+	git archive --format tar --output SOURCES/$(NAME)-$(VERSION).tar.gz HEAD:
 
-rpm: archive
-	mv $(NAME)-$(VERSION).tar.gz ~/rpmbuild/SOURCES
-	cp contrib/pony-homepage.spec ~/rpmbuild/SPECS
-	rpmbuild ~/rpmbuild/SPECS/pony_homepage.spec -bb\
+srpm: build_prepare
+	mock --buildsrpm \
+		--resultdir=. \
+		--spec=contrib/pony-homepage.spec \
+		--sources=SOURCES \
+		--define "_name $(NAME)"\
+		--define "_version $(VERSION)"\
+		--define "_release $(RELEASE)"\
+		--define "_description $(DESCRIPTION)"\
+		--define "_license $(LICENSE)"\
+		--define "_url $(URL)"\
+		--define '_long_description $(LONG_DESCRIPTION)'
+
+
+rpm: srpm
+	mock --rebuild *.src.rpm \
+		--resultdir=. \
 		--define "_name $(NAME)"\
 		--define "_version $(VERSION)"\
 		--define "_release $(RELEASE)"\
